@@ -1,6 +1,6 @@
 # crag.nvim
 
-Neovim integration for `crag`, the governance engine for AI coding agents.
+Neovim integration for [**crag**](https://crag.sh) — make every AI agent obey your codebase.
 
 ## Features
 
@@ -70,3 +70,9 @@ require('lualine').setup({
   },
 })
 ```
+
+---
+
+## The crag ecosystem
+
+[**crag.sh**](https://crag.sh) &middot; [Docs](https://crag.sh/docs) &middot; [GitHub](https://github.com/WhitehatD/crag) &middot; [npm](https://www.npmjs.com/package/@whitehatd/crag) &middot; [Dashboard](https://app.crag.sh) &middot; [VS Code](https://marketplace.visualstudio.com/items?itemName=whitehatd.vscode-crag) &middot; [Status](https://crag.sh/status)
