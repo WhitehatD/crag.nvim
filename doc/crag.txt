@@ -1,0 +1,75 @@
+*crag.txt*     Neovim integration for crag
+
+==============================================================================
+CONTENTS                                                *crag-contents*
+
+1. Introduction ................................................ *crag-intro*
+2. Commands .................................................... *crag-cmds*
+3. Setup ....................................................... *crag-setup*
+4. Health ..................................................... *crag-health*
+
+==============================================================================
+INTRODUCTION                                              *crag-intro*
+
+crag.nvim wraps the `crag` CLI and adds:
+
+- audit-backed statusline text
+- diagnostics for drift, stale, missing, and extra items
+- auto-compile on `.claude/governance.md` save
+- command wrappers for analyze, compile, audit, diff, doctor, and hook install
+
+==============================================================================
+COMMANDS                                                   *crag-cmds*
+
+:CragAnalyze
+    Generate governance.md from the current project.
+
+:CragCompile [target]
+    Compile governance to one target or `all`.
+
+:CragAudit
+    Run `crag audit` and refresh diagnostics.
+
+:CragDiff
+    Show the diff between governance and repository reality.
+
+:CragDoctor
+    Run `crag doctor`.
+
+:CragHookInstall
+    Install the crag pre-commit hook.
+
+:CragRefresh
+    Refresh the current audit state without opening a split.
+
+==============================================================================
+SETUP                                                     *crag-setup*
+
+>
+  require('crag').setup({
+    auto_compile = true,
+    status_line = true,
+    diagnostics = true,
+    cli_path = nil,
+  })
+<
+
+Use in a statusline:
+
+>
+  require('crag').status()
+<
+
+==============================================================================
+HEALTH                                                   *crag-health*
+
+Run:
+
+>
+  :checkhealth crag
+<
+
+This validates the Neovim version, CLI availability, and presence of
+`.claude/governance.md` in the current working directory.
+
+vim:tw=78:ts=8:noet:ft=help:norl:
