@@ -1,6 +1,6 @@
 # crag.nvim
 
-Neovim integration for [**crag**](https://crag.sh) — make every AI agent obey your codebase.
+Neovim integration for [**crag**](https://crag.sh) — make every AI agent obey your codebase. One `governance.md` → 23 AI tool configs.
 
 ## Features
 

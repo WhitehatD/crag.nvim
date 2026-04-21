@@ -106,7 +106,7 @@ end
 --- @param args string[]
 local function run_display(args)
   local buf = vim.api.nvim_create_buf(false, true)
-  vim.api.nvim_buf_set_option(buf, 'buftype', 'nofile')
+  vim.bo[buf].buftype = 'nofile'
   vim.api.nvim_buf_set_name(buf, '[crag ' .. args[1] .. ']')
   vim.cmd('botright split')
   vim.api.nvim_win_set_buf(0, buf)
@@ -195,8 +195,18 @@ end
 update_diagnostics = function(data)
   vim.diagnostic.reset(ns)
 
-  local gov_path = vim.fn.getcwd() .. '/.claude/governance.md'
-  local bufnr = vim.fn.bufnr(gov_path)
+  local cwd = vim.fn.getcwd()
+  local gov_path = cwd .. '/.claude/governance.md'
+  -- Normalize path separators for buffer matching on Windows
+  local gov_normalized = gov_path:gsub('\\', '/')
+  local bufnr = -1
+  for _, b in ipairs(vim.api.nvim_list_bufs()) do
+    local bname = vim.api.nvim_buf_get_name(b):gsub('\\', '/')
+    if bname == gov_normalized then
+      bufnr = b
+      break
+    end
+  end
   if bufnr == -1 then
     return
   end
@@ -227,7 +237,7 @@ update_diagnostics = function(data)
     table.insert(diagnostics, {
       lnum = 0,
       col = 0,
-      message = 'Missing: ' .. entry.target .. ' - ' .. (entry.indicator or ''),
+      message = 'Missing: ' .. entry.target .. (entry.indicator and (' - ' .. entry.indicator) or ''),
       severity = vim.diagnostic.severity.WARN,
       source = 'crag',
     })
@@ -269,9 +279,13 @@ local function setup_autocmds()
   local group = vim.api.nvim_create_augroup('crag', { clear = true })
 
   if config.auto_compile then
+    -- Use both forward and backslash patterns for Windows compatibility
+    local patterns = is_windows()
+      and { '*/.claude/governance.md', '*\\.claude\\governance.md' }
+      or { '*/.claude/governance.md' }
     vim.api.nvim_create_autocmd('BufWritePost', {
       group = group,
-      pattern = '*/.claude/governance.md',
+      pattern = patterns,
       callback = function()
         vim.notify('[crag] governance.md saved - recompiling...', vim.log.levels.INFO)
         vim.fn.jobstart(build_argv({ 'compile', '--target', 'all' }), {
@@ -304,6 +318,10 @@ local function register_commands()
     local target = opts.args ~= '' and opts.args or 'all'
     run_display({ 'compile', '--target', target })
   end, { desc = 'Compile governance to targets', nargs = '?' })
+
+  vim.api.nvim_create_user_command('CragScaffold', function()
+    run_display({ 'compile', '--target', 'scaffold' })
+  end, { desc = 'Generate hooks, settings, agents, CI playbook' })
 
   vim.api.nvim_create_user_command('CragAudit', function()
     run_display({ 'audit' })
